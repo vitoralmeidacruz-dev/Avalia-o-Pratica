@@ -3,38 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poppy Playtime - Playtime Co.</title>
+    <title>Poppy Playtime - Fuga da Fábrica</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <header>
-        <h1>Playtime Co.</h1>
-        <p>A fábrica de brinquedos mais divertida do mundo!</p>
-    </header>
+    <div class="game-container">
+        <header>
+            <h1>PLAYTIME CO.</h1>
+            <p>Sobreviva à fábrica de brinquedos!</p>
+        </header>
 
-    <main>
-        <section class="hero">
-            <h2>Cuidado com o Huggy Wuggy!</h2>
-            <div class="card">
-                <p id="mensagem">Clique no botão abaixo por sua conta e risco...</p>
-                <button id="btnSusto">Explorar a Fábrica</button>
-            </div>
+        <section class="status-panel">
+            <div class="status-box">Local: <span id="local-atual">Entrada Principal</span></div>
+            <div class="status-box">Chaves Encontradas: <span id="chaves-count">0</span> / 3</div>
         </section>
 
-        <section class="monstros">
-            <h2>Personagens Principais</h2>
-            <ul>
-                <li><strong>Huggy Wuggy:</strong> O mascote azul de braços longos.</li>
-                <li><strong>Poppy Playtime:</strong> A boneca inteligente.</li>
-                <li><strong>Mummy Long Legs:</strong> A boneca elástica e perigosa.</li>
-            </ul>
+        <section class="display-panel">
+            <div id="cenario-img" class="cenario entrada"></div>
+            <p id="texto-narrativa">Você está na recepção escura da Playtime Co. As portas principais estão trancadas por uma tranca elétrica. Você precisa encontrar 3 pilhas para carregar o GrabPack e escapar!</p>
         </section>
-    </main>
 
-    <footer>
-        <p>&copy; Playtime Co. - Todos os direitos reservados.</p>
-    </footer>
+        <section class="action-panel">
+            <button id="btn-acao1" class="btn">Procurar Pilha</button>
+            <button id="btn-acao2" class="btn">Ir para o Galpão Central</button>
+        </section>
+
+        <footer>
+            <button id="btn-reiniciar" class="btn-danger">Reiniciar Jogo</button>
+        </footer>
+    </div>
 
     <script src="script.js"></script>
 </body>
