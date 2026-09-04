@@ -3,37 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poppy Playtime - Fuga da Fábrica</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Poppy Playtime - Primeira Pessoa</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+            font-family: Arial, sans-serif;
+        }
+
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-shadow: 2px 2px 4px #000;
+            pointer-events: none;
+        }
+
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        #instrucoes {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border: 2px solid #ff0000;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 
-    <div class="game-container">
-        <header>
-            <h1>PLAYTIME CO.</h1>
-            <p>Sobreviva à fábrica de brinquedos!</p>
-        </header>
-
-        <section class="status-panel">
-            <div class="status-box">Local: <span id="local-atual">Entrada Principal</span></div>
-            <div class="status-box">Chaves Encontradas: <span id="chaves-count">0</span> / 3</div>
-        </section>
-
-        <section class="display-panel">
-            <div id="cenario-img" class="cenario entrada"></div>
-            <p id="texto-narrativa">Você está na recepção escura da Playtime Co. As portas principais estão trancadas por uma tranca elétrica. Você precisa encontrar 3 pilhas para carregar o GrabPack e escapar!</p>
-        </section>
-
-        <section class="action-panel">
-            <button id="btn-acao1" class="btn">Procurar Pilha</button>
-            <button id="btn-acao2" class="btn">Ir para o Galpão Central</button>
-        </section>
-
-        <footer>
-            <button id="btn-reiniciar" class="btn-danger">Reiniciar Jogo</button>
-        </footer>
+    <div id="ui">
+        <h2>PLAYTIME CO.</h2>
+        <p>Use <b>W, A, S, D</b> para andar e o <b>Mouse</b> para olhar.</p>
     </div>
 
-    <script src="script.js"></script>
+    <div id="crosshair"></div>
+
+    <div id="instrucoes">
+        <h1>CLIQUE PARA JOGAR</h1>
+        <p>Controles em Primeira Pessoa</p>
+    </div>
+
+    <!-- Importando Three.js e PointerLockControls via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
+
+    <script>
+        // Configuração da Cena
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x050505, 0.15); // Névoa escura
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Iluminação (Lanterna do jogador)
+        const light = new THREE.SpotLight(0xffffff, 1.5, 15, Math.PI / 6, 0.5);
+        camera.add(light);
+        light.target = camera;
+        light.position.set(0, 0, 1);
+        scene.add(camera);
+
+        const ambientLight = new THREE.AmbientLight(0x111122);
+        scene.add(ambientLight);
+
+        // Controles em Primeira Pessoa (Pointer Lock)
+        const controls = new THREE.PointerLockControls(camera, document.body);
+        const instrucoes = document.getElementById('instrucoes');
+
+        instrucoes.addEventListener('click', () => {
+            controls.lock();
+        });
+
+        controls.addEventListener('lock', () => {
+            instrucoes.style.display = 'none';
+        });
+
+        controls.addEventListener('unlock', () => {
+            instrucoes.style.display = 'block';
+        });
+
+        // Movimentação
+        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+        const velocity = new THREE.Vector3();
+        const direction = new THREE.Vector3();
+
+        const onKeyDown = (e) => {
+            switch (e.code) {
+                case 'KeyW': moveForward = true; break;
+                case 'KeyA': moveLeft = true; break;
+                case 'KeyS': moveBackward = true; break;
+                case 'KeyD': moveRight = true; break;
+            }
+        };
+
+        const onKeyUp = (e) => {
+            switch (e.code) {
+                case 'KeyW': moveForward = false; break;
+                case 'KeyA': moveLeft = false; break;
+                case 'KeyS': moveBackward = false; break;
+                case 'KeyD': moveRight = false; break;
+            }
+        };
+
+        document.addEventListener('keydown', onKeyDown);
+        document.addEventListener('keyup', onKeyUp);
+
+        // Criando o mapa (Chão e Paredes da Fábrica)
+        const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.8 });
+        
+        // Chão
+        const floorGeo = new THREE.PlaneGeometry(50, 50);
+        const floorMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+        const floor = new THREE.Mesh(floorGeo, floorMat);
+        floor.rotation.x = -Math.PI / 2;
+        scene.add(floor);
+
+        // Parede do Fundo
+        const wallGeo = new THREE.BoxGeometry(50, 6, 1);
+        const backWall = new THREE.Mesh(wallGeo, wallMaterial);
+        backWall.position.set(0, 3, -25);
+        scene.add(backWall);
+
+        // Huggy Wuggy (Modelo simplificado 3D)
+        const huggyGroup = new THREE.Group();
+        
+        // Corpo Azul
+        const bodyGeo = new THREE.CylinderGeometry(0.5, 0.3, 3);
+        const blueMat = new THREE.MeshStandardMaterial({ color: 0x0022ff });
+        const body = new THREE.Mesh(bodyGeo, blueMat);
+        body.position.y = 1.5;
+        huggyGroup.add(body);
+
+        // Cabeça com Sorriso
+        const headGeo = new THREE.SphereGeometry(0.6, 16, 16);
+        const head = new THREE.Mesh(headGeo, blueMat);
+        head.position.y = 3.2;
+        huggyGroup.add(head);
+
+        // Gravata Amarela
+        const tieGeo = new THREE.BoxGeometry(0.2, 0.6, 0.1);
+        const yellowMat = new THREE.MeshStandardMaterial({ color: 0xffcc00 });
+        const tie = new THREE.Mesh(tieGeo, yellowMat);
+        tie.position.set(0, 2.5, 0.4);
+        huggyGroup.add(tie);
+
+        huggyGroup.position.set(0, 0, -10);
+        scene.add(huggyGroup);
+
+        camera.position.y = 1.6; // Altura dos olhos
+
+        // Loop de Animação
+        let prevTime = performance.now();
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const time = performance.now();
+            if (controls.isLocked) {
+                const delta = (time - prevTime) / 1000;
+
+                velocity.x -= velocity.x * 10.0 * delta;
+                velocity.z -= velocity.z * 10.0 * delta;
+
+                direction.z = Number(moveForward) - Number(moveBackward);
+                direction.x = Number(moveRight) - Number(moveLeft);
+                direction.normalize();
+
+                if (moveForward || moveBackward) velocity.z -= direction.z * 40.0 * delta;
+                if (moveLeft || moveRight) velocity.x -= direction.x * 40.0 * delta;
+
+                controls.moveRight(-velocity.x * delta);
+                controls.moveForward(-velocity.z * delta);
+
+                // Pequeno movimento de "respiração" do Huggy Wuggy
+                huggyGroup.position.y = Math.sin(time * 0.003) * 0.1;
+            }
+
+            prevTime = time;
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Ajuste de janela
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
 </body>
 </html>
