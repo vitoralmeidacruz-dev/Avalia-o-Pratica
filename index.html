@@ -2,215 +2,62 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poppy Playtime - Primeira Pessoa</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #000;
-            font-family: Arial, sans-serif;
-        }
-
-        #ui {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: white;
-            text-shadow: 2px 2px 4px #000;
-            pointer-events: none;
-        }
-
-        #crosshair {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 8px;
-            height: 8px;
-            background-color: rgba(255, 255, 255, 0.7);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-        }
-
-        #instrucoes {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            border: 2px solid #ff0000;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-    </style>
+    <title>Poppy Playtime - Primeira Pessoa (Fotos)</title>
 </head>
-<body>
+<body style="background-color: black; color: white; text-align: center; font-family: sans-serif;">
 
-    <div id="ui">
-        <h2>PLAYTIME CO.</h2>
-        <p>Use <b>W, A, S, D</b> para andar e o <b>Mouse</b> para olhar.</p>
+    <h1>PLAYTIME CO. - SOBREVIVÊNCIA</h1>
+    <hr>
+
+    <!-- ========= SEÇÃO: OLHANDO PARA FRENTE (HUGGY WUGGY) ========= -->
+    <div id="frente" style="margin-bottom: 50px;">
+        <h2>Visão: Frente</h2>
+        <p>Você vê o corredor escuro e o Huggy Wuggy ao fundo!</p>
+        
+        <!-- IMAGEM DO HUGGY WUGGY -->
+        <img src="https://i.imgur.com/8Xb3G4w.jpeg" alt="Huggy Wuggy no corredor escuro" width="600" height="400" style="border: 5px solid red;">
+        
+        <br><br>
+        <b>Ações:</b><br>
+        <a href="#direita" style="color: yellow; font-size: 1.2em;">Olhar para Direita (D)</a> | 
+        <a href="#esquerda" style="color: yellow; font-size: 1.2em;">Olhar para Esquerda (A)</a><br><br>
+        <button disabled>Andar para Frente (Bloqueado pelo monstro)</button>
     </div>
 
-    <div id="crosshair"></div>
+    <hr>
 
-    <div id="instrucoes">
-        <h1>CLIQUE PARA JOGAR</h1>
-        <p>Controles em Primeira Pessoa</p>
+    <!-- ========= SEÇÃO: OLHANDO PARA DIREITA (CENA ESCURA) ========= -->
+    <div id="direita" style="margin-bottom: 50px;">
+        <h2>Visão: Direita</h2>
+        <p>Apenas uma parede metálica e um duto de ventilação.</p>
+        
+        <!-- IMAGEM DA PAREDE/DUTO -->
+        <img src="https://i.imgur.com/oU6tM6d.jpeg" alt="Parede escura com duto" width="600" height="400" style="border: 5px solid blue;">
+        
+        <br><br>
+        <b>Ações:</b><br>
+        <a href="#frente" style="color: yellow; font-size: 1.2em;">Voltar para Frente (A)</a><br><br>
+        <button>Entrar no Duto</button>
     </div>
 
-    <!-- Importando Three.js e PointerLockControls via CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
+    <hr>
 
-    <script>
-        // Configuração da Cena
-        const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x050505, 0.15); // Névoa escura
-
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        // Iluminação (Lanterna do jogador)
-        const light = new THREE.SpotLight(0xffffff, 1.5, 15, Math.PI / 6, 0.5);
-        camera.add(light);
-        light.target = camera;
-        light.position.set(0, 0, 1);
-        scene.add(camera);
-
-        const ambientLight = new THREE.AmbientLight(0x111122);
-        scene.add(ambientLight);
-
-        // Controles em Primeira Pessoa (Pointer Lock)
-        const controls = new THREE.PointerLockControls(camera, document.body);
-        const instrucoes = document.getElementById('instrucoes');
-
-        instrucoes.addEventListener('click', () => {
-            controls.lock();
-        });
-
-        controls.addEventListener('lock', () => {
-            instrucoes.style.display = 'none';
-        });
-
-        controls.addEventListener('unlock', () => {
-            instrucoes.style.display = 'block';
-        });
-
-        // Movimentação
-        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
-        const velocity = new THREE.Vector3();
-        const direction = new THREE.Vector3();
-
-        const onKeyDown = (e) => {
-            switch (e.code) {
-                case 'KeyW': moveForward = true; break;
-                case 'KeyA': moveLeft = true; break;
-                case 'KeyS': moveBackward = true; break;
-                case 'KeyD': moveRight = true; break;
-            }
-        };
-
-        const onKeyUp = (e) => {
-            switch (e.code) {
-                case 'KeyW': moveForward = false; break;
-                case 'KeyA': moveLeft = false; break;
-                case 'KeyS': moveBackward = false; break;
-                case 'KeyD': moveRight = false; break;
-            }
-        };
-
-        document.addEventListener('keydown', onKeyDown);
-        document.addEventListener('keyup', onKeyUp);
-
-        // Criando o mapa (Chão e Paredes da Fábrica)
-        const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.8 });
+    <!-- ========= SEÇÃO: OLHANDO PARA ESQUERDA (PORTA) ========= -->
+    <div id="esquerda" style="margin-bottom: 50px;">
+        <h2>Visão: Esquerda</h2>
+        <p>Uma porta trancada com um quebra-cabeça de cores.</p>
         
-        // Chão
-        const floorGeo = new THREE.PlaneGeometry(50, 50);
-        const floorMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
-        const floor = new THREE.Mesh(floorGeo, floorMat);
-        floor.rotation.x = -Math.PI / 2;
-        scene.add(floor);
-
-        // Parede do Fundo
-        const wallGeo = new THREE.BoxGeometry(50, 6, 1);
-        const backWall = new THREE.Mesh(wallGeo, wallMaterial);
-        backWall.position.set(0, 3, -25);
-        scene.add(backWall);
-
-        // Huggy Wuggy (Modelo simplificado 3D)
-        const huggyGroup = new THREE.Group();
+        <!-- IMAGEM DA PORTA -->
+        <img src="https://i.imgur.com/L1M5E1U.jpeg" alt="Porta trancada com quebra-cabeça" width="600" height="400" style="border: 5px solid green;">
         
-        // Corpo Azul
-        const bodyGeo = new THREE.CylinderGeometry(0.5, 0.3, 3);
-        const blueMat = new THREE.MeshStandardMaterial({ color: 0x0022ff });
-        const body = new THREE.Mesh(bodyGeo, blueMat);
-        body.position.y = 1.5;
-        huggyGroup.add(body);
+        <br><br>
+        <b>Ações:</b><br>
+        <a href="#frente" style="color: yellow; font-size: 1.2em;">Voltar para Frente (D)</a><br><br>
+        <button>Usar GrabPack na Porta</button>
+    </div>
 
-        // Cabeça com Sorriso
-        const headGeo = new THREE.SphereGeometry(0.6, 16, 16);
-        const head = new THREE.Mesh(headGeo, blueMat);
-        head.position.y = 3.2;
-        huggyGroup.add(head);
+    <hr>
+    <p><i>Nota: Sem JavaScript, este jogo usa âncoras HTML para pular entre as imagens. Os botões de ação não funcionam sem script.</i></p>
 
-        // Gravata Amarela
-        const tieGeo = new THREE.BoxGeometry(0.2, 0.6, 0.1);
-        const yellowMat = new THREE.MeshStandardMaterial({ color: 0xffcc00 });
-        const tie = new THREE.Mesh(tieGeo, yellowMat);
-        tie.position.set(0, 2.5, 0.4);
-        huggyGroup.add(tie);
-
-        huggyGroup.position.set(0, 0, -10);
-        scene.add(huggyGroup);
-
-        camera.position.y = 1.6; // Altura dos olhos
-
-        // Loop de Animação
-        let prevTime = performance.now();
-
-        function animate() {
-            requestAnimationFrame(animate);
-
-            const time = performance.now();
-            if (controls.isLocked) {
-                const delta = (time - prevTime) / 1000;
-
-                velocity.x -= velocity.x * 10.0 * delta;
-                velocity.z -= velocity.z * 10.0 * delta;
-
-                direction.z = Number(moveForward) - Number(moveBackward);
-                direction.x = Number(moveRight) - Number(moveLeft);
-                direction.normalize();
-
-                if (moveForward || moveBackward) velocity.z -= direction.z * 40.0 * delta;
-                if (moveLeft || moveRight) velocity.x -= direction.x * 40.0 * delta;
-
-                controls.moveRight(-velocity.x * delta);
-                controls.moveForward(-velocity.z * delta);
-
-                // Pequeno movimento de "respiração" do Huggy Wuggy
-                huggyGroup.position.y = Math.sin(time * 0.003) * 0.1;
-            }
-
-            prevTime = time;
-            renderer.render(scene, camera);
-        }
-
-        animate();
-
-        // Ajuste de janela
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-    </script>
 </body>
 </html>
